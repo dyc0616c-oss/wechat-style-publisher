@@ -1,0 +1,23 @@
+# Sensitive config
+.env
+.env.*
+config.json
+*.secret
+
+# Runtime / temp outputs
+runtime/
+*.log
+*.tmp
+*.temp
+
+# Generated media
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+
+# System / editor
+.DS_Store
+.vscode/
+.idea/

@@ -1,223 +1,48 @@
 # wechat-style-publisher
 
-一个给 **微信公众号内容团队 / 个人号主** 用的总 skill。
+一个给 **微信公众号内容团队 / 个人号主** 用的 OpenClaw Skill。
 
-它不是单纯“帮你写一篇文章”的小工具，
-而是想做成一条完整路径：
-
-- 学习你的公众号风格
-- 接微信开发者平台
-- 接 Tuzi 文生图
-- 拿素材做一篇测试稿
-- 自动保存到公众号草稿箱
+它做的事情很简单：
+**先学习你的公众号风格，再按这个风格生成测试稿，并尝试保存到微信公众号草稿箱。**
 
 ---
 
-## 这个 skill 现在可以干什么？
+## 这个 skill 能做什么
 
-目前这版是 **MVP / 可试机版**，重点先把路径跑通。
+- 学习 5-10 篇历史公众号文章风格
+- 生成 `style-a / style-b` 这样的风格文件
+- 建立账号与 style 的映射
+- 接入微信公众号开发者平台
+- 接入 Tuzi 文生图能力
+- 按指定 style 生成测试稿
+- 自动保存到微信公众号草稿箱
 
-它现在主要能做：
-
-1. **学习公众号风格**
-   - 用户提供 5-10 篇自己写过的公众号文章
-   - skill 会分析这些文章，提炼一个 style 文件（例如 `style-a`）
-
-2. **生成 style 文件**
-   - 把标题长度、摘要长度、正文节奏、重点句样式、结尾结构等规则整理成可执行 spec
-
-3. **接微信公众号开发者平台**
-   - 支持通过 `AppID + AppSecret` 获取 token
-   - 支持微信接口测试
-   - 支持创建公众号草稿
-
-4. **接 Tuzi 文生图**
-   - 用户提供 `TUZI_API_KEY`
-   - 可用于封面图 / 正文插图测试
-
-5. **跑测试稿闭环**
-   - 用户给一个素材、主题或链接
-   - skill 生成一篇测试稿
-   - 保存到微信公众号草稿箱
-   - 用户去后台看效果，再决定要不要继续优化 style
+当前版本定位：**MVP / 可试机版**。
+重点是先把“学习 style → 接微信 → 跑测试稿 → 存草稿”这条链路跑通。
 
 ---
 
-## 这个 skill 适合谁？
+## 适合谁
 
-适合这些人：
+适合：
+- 自己运营公众号，想把“号味”沉淀下来的人
+- 有多个公众号，想训练不同 style 的团队
+- 想把“写稿 + 配图 + 草稿测试”串成一条流程的人
 
-- 自己运营公众号，想把“自己的号味”固化下来
-- 有多个公众号，想把不同号做成 `style-a / style-b / style-c`
-- 想把“写稿 + 生图 + 草稿测试”流程串起来
-- 不想每次都手工重复配微信接口
-
-不适合这些场景：
-
-- 只想随手写一篇，不关心风格沉淀
-- 不打算接微信开发者平台
-- 不打算做图文测试闭环
+不适合：
+- 只想临时写一篇、不关心风格沉淀的人
+- 不打算接入微信公众号开发者平台的人
 
 ---
 
-## 使用前，用户需要准备什么？
-
-### 一、学习风格时需要提供
-用户至少要提供：
-
-- **公众号名称**
-- **5-10 篇历史文章**
-
-最好是：
-- 同一个公众号最近一段时间的代表性文章
-- 能体现这个号的标题、语气、排版、结尾习惯
-
----
-
-### 二、接微信公众号时需要提供
-用户需要去 **微信公众平台开发者设置** 里准备：
-
-- `AppID`
-- `AppSecret`
-- 把当前运行机器的公网 IP 加入 **API 白名单**
-
-如果没加白名单，常见报错会是：
-- `invalid ip not in whitelist`
-
----
-
-### 三、接 Tuzi 文生图时需要提供
-用户需要提供：
-
-- `TUZI_API_KEY`
-
-用途：
-- 生成封面图
-- 生成正文插图
-
----
-
-## 这个 skill 的基本使用流程
-
-### 第 1 步：先学习一个公众号风格
-用户提供 5-10 篇历史文章后，先跑风格学习。
-
-当前脚本：
-
-```bash
-python3 scripts/learn_style.py \
-  --account-name "你的公众号名" \
-  --style-id style-a \
-  --inputs article1.md article2.md article3.md \
-  --write-map
-```
-
-这一步会做什么：
-- 分析文章样本
-- 生成 `style-a.md`
-- 更新 `account-style-map.json`
-
----
-
-### 第 2 步：接微信开发者平台
-需要先准备环境变量：
-
-```bash
-export WECHAT_APP_ID="你的AppID"
-export WECHAT_APP_SECRET="你的AppSecret"
-```
-
-如果你用的是旧变量名，也兼容：
-
-```bash
-export DASHU_MP_APP_ID="你的AppID"
-export DASHU_MP_APP_SECRET="你的AppSecret"
-```
-
----
-
-### 第 3 步：接 Tuzi 文生图
-准备：
-
-```bash
-export TUZI_API_KEY="你的TUZI_API_KEY"
-```
-
-旧变量名也兼容：
-
-```bash
-export AI_GATEWAY_API_KEY="你的TUZI_API_KEY"
-```
-
----
-
-### 第 4 步：跑一篇测试稿
-当 `style-a`、微信、Tuzi 都准备好之后，可以跑测试稿。
-
-当前脚本：
-
-```bash
-python3 scripts/run_draft_test.py \
-  --style-id style-a \
-  --source "https://example.com/article" \
-  --publish
-```
-
-这一步会做什么：
-- 读取 `style-a`
-- 渲染一篇测试稿
-- 生成测试封面
-- 上传到微信
-- 保存到草稿箱
-
----
-
-## 用户使用时，最终会得到什么？
-
-正常情况下，用户最终会得到：
-
-- 一个学出来的风格文件，例如 `style-a.md`
-- 一个账号映射配置 `account-style-map.json`
-- 一篇保存到公众号草稿箱里的测试稿
-- 一条微信草稿 `media_id`
-
-然后用户就可以去公众号后台看效果：
-- 像不像自己的号
-- 标题对不对
-- 段落节奏对不对
-- 结尾风格对不对
-- 要不要继续优化 style
-
----
-
-## 这版现在的状态
-
-这不是一个“已经完美”的正式版，
-而是一个：
-
-**可试机、可验证路径的 MVP 版本。**
-
-它的重点是先证明：
-
-- 路径能跑通
-- style 能学出来
-- 微信能接上
-- 草稿能存进去
-
-如果这条路验证通过，后面再继续打磨：
-- 更聪明的 style 学习
-- 更像真人号的测试稿
-- 更好的图文策略
-- 更多 style 的扩展
-
----
-
-## 目前仓库结构
+## 仓库结构
 
 ```text
 wechat-style-publisher/
 ├── SKILL.md
 ├── README.md
+├── .env.example
+├── requirements.txt
 ├── .gitignore
 ├── references/
 │   ├── style-learning-workflow.md
@@ -235,10 +60,176 @@ wechat-style-publisher/
 
 ---
 
-## 一句话总结
+## 最简单使用方法
 
-这个 skill 想做的事情很简单：
+### 第一步：把仓库放到 OpenClaw 的 skills 目录
 
-**先学会你的公众号怎么写，再帮你把测试稿真正存进微信草稿箱。**
+放到以下任一位置：
 
-如果它能把这条路跑顺，后面才值得继续往上加更复杂的功能。
+```bash
+~/.openclaw/skills/wechat-style-publisher
+```
+
+或者：
+
+```bash
+<workspace>/skills/wechat-style-publisher
+```
+
+### 第二步：重启 OpenClaw
+
+```bash
+openclaw gateway restart
+```
+
+### 第三步：直接对助手说
+
+例如：
+- 学习这 5 篇公众号文章风格，生成 style-a
+- 帮我接微信公众号发布
+- 按 style-a 写一篇测试稿并保存到草稿箱
+
+---
+
+## 使用前要准备什么
+
+### 1）学习风格时
+请准备：
+- 公众号名称
+- 5-10 篇历史文章
+
+建议这些文章能体现：
+- 标题风格
+- 摘要长度
+- 正文语气
+- 段落节奏
+- 结尾 CTA
+- 图片习惯
+
+### 2）接微信公众号时
+请准备：
+- `AppID`
+- `AppSecret`
+- 当前运行机器公网 IP 已加入微信 API 白名单
+
+如果没加白名单，常见错误是：
+
+```text
+invalid ip not in whitelist
+```
+
+### 3）接 Tuzi 时
+请准备：
+- `TUZI_API_KEY`
+
+---
+
+## 环境变量
+
+可以参考 `.env.example`。
+
+最常用的是：
+
+```bash
+export WECHAT_APP_ID="你的AppID"
+export WECHAT_APP_SECRET="你的AppSecret"
+export TUZI_API_KEY="你的TUZI_API_KEY"
+```
+
+兼容旧变量名：
+
+```bash
+export DASHU_MP_APP_ID="你的AppID"
+export DASHU_MP_APP_SECRET="你的AppSecret"
+export AI_GATEWAY_API_KEY="你的TUZI_API_KEY"
+```
+
+---
+
+## 脚本用法
+
+### 1）学习 style
+
+```bash
+python3 scripts/learn_style.py \
+  --account-name "你的公众号名" \
+  --style-id style-a \
+  --inputs article1.md article2.md article3.md \
+  --write-map
+```
+
+效果：
+- 分析文章样本
+- 生成 `style-a.md`
+- 更新 `account-style-map.json`
+
+### 2）跑测试稿并尝试发布
+
+```bash
+python3 scripts/run_draft_test.py \
+  --style-id style-a \
+  --source "https://example.com/article" \
+  --publish
+```
+
+效果：
+- 读取 `style-a`
+- 生成测试稿
+- 生成测试封面
+- 上传到微信
+- 保存到草稿箱
+
+---
+
+## 安装检查
+
+安装后可以执行：
+
+```bash
+openclaw skills list
+openclaw skills info wechat-style-publisher
+openclaw skills check
+```
+
+如果能看到 `wechat-style-publisher`，说明已识别成功。
+
+---
+
+## 常见问题
+
+### skill 装了但没生效
+先执行：
+
+```bash
+openclaw gateway restart
+```
+
+然后再查：
+
+```bash
+openclaw skills list
+```
+
+### 微信接口报错
+优先检查：
+- AppID / AppSecret 是否正确
+- 当前机器公网 IP 是否已加入白名单
+
+### Tuzi 没出图
+优先检查：
+- `TUZI_API_KEY` 是否正确
+- 是否用了旧变量名但没配上
+
+### 草稿没有保存成功
+优先检查：
+- 微信 access token 是否获取成功
+- 素材内容是否符合接口要求
+- 是否真的执行了 `--publish`
+
+---
+
+## 最后一句话
+
+这个 skill 的目标不是“随手写一篇”，而是：
+
+**先学会你的公众号怎么写，再帮你按这个风格生成测试稿，并真正存进微信草稿箱。**
